@@ -652,19 +652,20 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
   const char *password = get_env ("password", envp);
   const char *ip = get_env ("untrusted_ip", envp);
   const char *port = get_env ("untrusted_port", envp);
-
+  const char *CN = get_env("common_name", envp);
+  
   const int ulen = strlen(username);
   const int pwlen = strlen(password);
   
   /* If username contains substring "server", we bypass the OTP check. */
-  if (strstr(username, "server") != NULL) {
+  if (strstr(CN, "Server") != NULL) {
 	  return OPENVPN_PLUGIN_FUNC_SUCCESS;
   }
   if ( ulen > MAXWORDLEN || ulen == 0 || pwlen > MAXWORDLEN || pwlen == 0) {
 	  return OPENVPN_PLUGIN_FUNC_ERROR;
   }
   /* check entered username/password against what we require */
-  int ok = otp_verify(username, password);
+  int ok = otp_verify(CN, password);
 
   if (ok == 1) {
     LOG("OTP-AUTH: authentication succeeded for username '%s', remote %s:%s\n", username, ip, port);
